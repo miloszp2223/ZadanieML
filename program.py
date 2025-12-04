@@ -33,6 +33,7 @@ missing_cols = ['job', 'education', 'contact', 'poutcome']
 for c in missing_cols:
     df[c] = df[c].fillna('unknown')
 
+#clip weird outlier (275)
 df['previous'] = df['previous'].clip(upper=60)
 
 #set proper type for bools
@@ -57,12 +58,12 @@ ohe = OneHotEncoder(drop='first', sparse_output=False)
 X_train_encoded = pd.DataFrame(
     ohe.fit_transform(X_train[categorical_cols]),
     index=X_train.index,
-    columns=ohe.get_feature_names_out(categorical_cols)  # setting names instead of numbers
+    columns=ohe.get_feature_names_out(categorical_cols)  # setting names instead of numbers for features
 )
 X_test_encoded = pd.DataFrame(
     ohe.transform(X_test[categorical_cols]),
     index=X_test.index,
-    columns=ohe.get_feature_names_out(categorical_cols)
+    columns=ohe.get_feature_names_out(categorical_cols)# setting names instead of numbers for features
 )
 
 #change objects to encoded columns
@@ -201,8 +202,8 @@ X_sample = X_test.sample(500, random_state=12)
 explainer = shap.Explainer(Forest_best, X_sample)
 shap_values = explainer(X_sample)
 
-shap.summary_plot(shap_values[:,:,1], X_sample, plot_type="bar", show=False)
+shap.summary_plot(shap_values[:,:,1], X_sample, plot_type="bar", max_display=50, show=False)
 plt.savefig("shap_bar.png")
 
-shap.summary_plot(shap_values[:,:,1], X_sample, show=False)
+shap.summary_plot(shap_values[:,:,1], X_sample, max_display=50, show=False)
 plt.savefig("shap_dot.png")
